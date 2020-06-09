@@ -1,5 +1,8 @@
 import colors from 'colors';
 import app from './app.js';
+import connectMongoDB from './config/connectMongoDB.js';
+
+connectMongoDB();
 
 const PORT = process.env.PORT || 3000;
 
