@@ -1,0 +1,52 @@
+/* eslint-disable no-console */
+import colors from 'colors';
+import dotenv from 'dotenv';
+import fs from 'fs';
+import path from 'path';
+import Tour from '../models/Tour.js';
+import connectMongoDB from './connectMongoDB.js';
+
+dotenv.config();
+
+connectMongoDB();
+
+const tours = JSON.parse(
+  fs.readFileSync(
+    path.resolve('dev-data', 'data', 'tours-simple.json'),
+    'utf-8'
+  )
+);
+
+// const users = JSON.parse(
+//   fs.readFileSync(path.resolve('dev-data', 'data', 'users.json'), 'utf-8')
+// );
+
+// IMPORT DATA INTO DB
+const importData = async () => {
+  try {
+    await Tour.create(tours, { validateBeforeSave: false });
+    // await User.create(users, { validateBeforeSave: false });
+    console.log(colors.green.inverse('Data successfuly imported'));
+    process.exit();
+  } catch (error) {
+    console.error(colors.red(error));
+  }
+};
+
+// DELETE ALL DATA FROM COLLECTION
+const deleteData = async () => {
+  try {
+    await Tour.deleteMany({});
+    // await User.deleteMany({});
+    console.log(colors.red.inverse('Data successfuly deleted'));
+    process.exit();
+  } catch (error) {
+    console.error(colors.red(error));
+  }
+};
+
+if (process.argv[2] === '--import') {
+  importData();
+} else if (process.argv[2] === '--delete') {
+  deleteData();
+}
