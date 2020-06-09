@@ -24,13 +24,13 @@ const tours = JSON.parse(
 // IMPORT DATA INTO DB
 const importData = async () => {
   try {
-    await Tour.create(tours, { validateBeforeSave: false });
+    await Tour.create(tours);
     // await User.create(users, { validateBeforeSave: false });
     console.log(colors.green.inverse('Data successfuly imported'));
-    process.exit();
   } catch (error) {
     console.error(colors.red(error));
   }
+  process.exit();
 };
 
 // DELETE ALL DATA FROM COLLECTION
@@ -39,10 +39,10 @@ const deleteData = async () => {
     await Tour.deleteMany({});
     // await User.deleteMany({});
     console.log(colors.red.inverse('Data successfuly deleted'));
-    process.exit();
   } catch (error) {
     console.error(colors.red(error));
   }
+  process.exit();
 };
 
 if (process.argv[2] === '--import') {
