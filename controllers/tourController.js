@@ -1,24 +1,12 @@
-import fs from 'fs';
-import path from 'path';
+import Tour from '../models/Tour.js';
 import ResponseStatus from '../utils/responseStatus.js';
 
-const tours = JSON.parse(
-  fs.readFileSync(path.resolve('dev-data', 'data', 'tours-simple.json'))
-);
+// @desc      Get All Tours
+// @route     GET /api/v1/tours
+// @access    Public
+export const getAllTours = async (req, res, next) => {
+  const tours = await Tour.find();
 
-export const checkId = (req, res, next, val) => {
-  const tour = tours.find((tour) => tour.id === +val);
-
-  if (!tour)
-    return res.status(404).json({
-      status: ResponseStatus.FAILURE,
-      message: 'No tour with specified id',
-    });
-
-  next();
-};
-
-export const getAllTours = (req, res, next) => {
   res.status(200).json({
     status: ResponseStatus.SUCCESS,
     results: tours.length,
@@ -26,26 +14,37 @@ export const getAllTours = (req, res, next) => {
   });
 };
 
-export const createTour = (req, res, next) => {
-  const tour = req.body;
-
-  res.status(201).json({ status: ResponseStatus.SUCCESS, data: { tour } });
-};
-
-export const getTour = (req, res, next) => {
-  const tour = tours.find((tour) => tour.id === +req.params.id);
+// @desc      Get Tour By Id
+// @route     GET /api/v1/tours/:tourId
+// @access    Public
+export const getTour = async (req, res, next) => {
+  const tour = await Tour.findById(req.params.id);
+  // if (!tour) return next(new Error('No document found with the specified id'));
   res.status(200).json({ status: ResponseStatus.SUCCESS, data: { tour } });
 };
 
-export const updateTour = (req, res, next) => {
-  const tour = tours.find((tour) => tour.id === +req.params.id);
-  const updatedTour = { ...tour, ...req.body };
-
-  res
-    .status(200)
-    .json({ status: ResponseStatus.SUCCESS, data: { updatedTour } });
+// @desc      Create New Tour
+// @route     POST /api/v1/tours
+// @access    Public
+export const createTour = async (req, res, next) => {
+  const tour = await Tour.create(req.body);
+  res.status(201).json({ status: ResponseStatus.SUCCESS, data: { tour } });
 };
 
-export const deleteTour = (req, res, next) => {
+// @desc      Update tour
+// @route     PATHS /api/v1/tours/:tourId
+// @access    Public
+export const updateTour = async (req, res, next) => {
+  const tour = await Tour.findByIdAndUpdate(req.params.id, req.body);
+  // if (!tour) return next(new Error('No document found with the specified id'));
+  res.status(200).json({ status: ResponseStatus.SUCCESS, data: { tour } });
+};
+
+// @desc      Delete tour
+// @route     DELETE /api/v1/tours/:tourId
+// @access    Public
+export const deleteTour = async (req, res, next) => {
+  await Tour.findByIdAndDelete(req.params.id);
+  // if (!tour) return next(new Error('No document found with the specified id'));
   res.status(204).json({ status: ResponseStatus.SUCCESS, data: null });
 };

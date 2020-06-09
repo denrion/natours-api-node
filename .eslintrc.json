@@ -21,6 +21,8 @@
     "prefer-destructuring": ["error", { "object": true, "array": false }],
     "no-unused-vars": ["error", { "argsIgnorePattern": "req|res|next|val" }],
     "no-restricted-imports": "off",
-    "import/extensions": ["error", "always", { "ignorePackages": true }]
+    "import/extensions": ["error", "always", { "ignorePackages": true }],
+    "import/prefer-default-export": "off",
+    "no-shadow": "off"
   }
 }
