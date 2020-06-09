@@ -35,7 +35,10 @@ export const createTour = async (req, res, next) => {
 // @route     PATHS /api/v1/tours/:tourId
 // @access    Public
 export const updateTour = async (req, res, next) => {
-  const tour = await Tour.findByIdAndUpdate(req.params.id, req.body);
+  const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+    runValidators: true,
+  });
   // if (!tour) return next(new Error('No document found with the specified id'));
   res.status(200).json({ status: ResponseStatus.SUCCESS, data: { tour } });
 };
