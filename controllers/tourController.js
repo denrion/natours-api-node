@@ -1,17 +1,42 @@
 import Tour from '../models/Tour.js';
+import APIFeatures from '../utils/APIFeatures.js';
 import ResponseStatus from '../utils/responseStatus.js';
+
+// @desc      Get Top 5 Cheapest Tours
+// @route     GET /api/v1/tours?sort=-ratingsAverage,price&limit=5
+// @access    Public
+// @usage     Use as middleware before getAllTours
+export const aliasTopTours = (req, res, next) => {
+  req.query.limit = '5';
+  req.query.sort = 'ratingsAverage,price';
+  req.query.fields = 'name,price,ratingsAverage,summary,difficulty';
+  next();
+};
 
 // @desc      Get All Tours
 // @route     GET /api/v1/tours
 // @access    Public
 export const getAllTours = async (req, res, next) => {
-  const tours = await Tour.find();
+  try {
+    const features = new APIFeatures(Tour.find(), req.query)
+      .filter()
+      .sort()
+      .limitFields()
+      .paginate();
 
-  res.status(200).json({
-    status: ResponseStatus.SUCCESS,
-    results: tours.length,
-    data: { tours },
-  });
+    const tours = await features.query;
+
+    res.status(200).json({
+      status: ResponseStatus.SUCCESS,
+      results: tours.length,
+      data: { tours },
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: ResponseStatus.FAILURE,
+      message: error,
+    });
+  }
 };
 
 // @desc      Get Tour By Id
