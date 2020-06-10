@@ -126,7 +126,7 @@ tourSchema.pre('aggregate', function (next) {
 
 // ************************ PLUGINS ************************ //
 tourSchema.plugin(uniqueValidator, {
-  message: 'Tour with {PATH}:{VALUE} already exists. Please try again',
+  message: 'Tour with {PATH}:{VALUE} already exists. Please use another value.',
 });
 
 const Tour = mongoose.model('Tour', tourSchema);

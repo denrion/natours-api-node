@@ -1,0 +1,82 @@
+import colors from 'colors';
+import status from 'http-status';
+import BadRequestError from '../utils/errors/BadRequestError.js';
+import UnauthorizedError from '../utils/errors/UnauthorizedError.js';
+import ResponseStatus from '../utils/responseStatus.js';
+
+const sendErrorDev = (err, res) => {
+  res.status(err.statusCode).json({
+    status: err.status,
+    message: err.message,
+    error: err,
+    stack: err.stack,
+  });
+};
+
+const sendErrorProd = (err, res) => {
+  // Operational, trusted error: send message to client
+  if (err.isOperational) {
+    res.status(err.statusCode).json({
+      status: err.status,
+      message: err.message,
+    });
+
+    // Programming or other unknown error: don`t leak the error detals
+  } else {
+    // 1) Log error: for DEVS
+    // eslint-disable-next-line no-console
+    console.error(colors.red('ERROR 💥 %s'), err);
+
+    // 2) Send generic message: for CLIENT
+    res.status(status.INTERNAL_SERVER_ERROR).json({
+      status: ResponseStatus.ERROR,
+      message: 'Something went very wrong',
+    });
+  }
+};
+
+// Handle specific error functions
+const handleCastErrorDB = (err) => {
+  const message = `Invalid ${err.path}: ${err.value}`;
+  return new BadRequestError(message);
+};
+
+const handleDuplicateFieldsDB = (err) => {
+  const value = err.errmsg.match(/(["'])(?:(?=(\\?))\2.)*?\1/)[0];
+  const message = `Duplicate field value: ${value}. Please use another value!`;
+  return new BadRequestError(message);
+};
+
+const handleValidationErrorDB = (err) => {
+  const errors = Object.values(err.errors).map((error) => error.message);
+  const message = `Invalid input data. ${errors.join('. ')}`;
+  return new BadRequestError(message);
+};
+
+const handleJWTError = () =>
+  new UnauthorizedError('Invalid token. Please log in again.');
+
+const handleJWTExpiredError = () =>
+  new UnauthorizedError('JWT token expired. Please log in again.');
+
+const globalErrorHandler = (err, req, res, next) => {
+  err.statusCode = err.statusCode || status.INTERNAL_SERVER_ERROR;
+  err.status = err.status || ResponseStatus.ERROR;
+
+  let error = { ...err };
+
+  if (process.env.NODE_ENV === 'development') {
+    sendErrorDev(err, res);
+  } else if (process.env.NODE_ENV === 'production') {
+    if (err.name === 'CastError') error = handleCastErrorDB(err);
+    else if (err.code === 11000) error = handleDuplicateFieldsDB(err);
+    else if (err.name === 'ValidationError')
+      error = handleValidationErrorDB(err);
+    else if (err.name === 'JsonWebTokenError') error = handleJWTError();
+    else if (err.name === 'TokenExpiredError') error = handleJWTExpiredError();
+
+    sendErrorProd(error, res);
+  }
+};
+
+export default globalErrorHandler;
