@@ -53,9 +53,17 @@ const tourSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
   }
 );
 
+// ************************ VIRTUALS ************************ //
+tourSchema.virtual('durationWeeks').get(function () {
+  return Math.ceil(this.duration / 7);
+});
+
+// ************************ PLUGINS ************************ //
 tourSchema.plugin(uniqueValidator, {
   message: 'Tour with {PATH}:{VALUE} already exists. Please try again',
 });
