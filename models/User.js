@@ -1,4 +1,5 @@
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 import mongoose from 'mongoose';
 import uniqueValidator from 'mongoose-unique-validator';
 
@@ -30,6 +31,7 @@ const userSchema = new mongoose.Schema(
         /^[a-zA-Z0-9]+(?:[_-]?[a-zA-Z0-9])*$/,
         'Password can only contain letters, numbers, underscores and dashes',
       ],
+      select: false,
     },
     passwordConfirm: {
       type: String,
@@ -82,7 +84,24 @@ userSchema.pre('save', async function (next) {
 
 // **************** AGGREGATION MIDDLEWARE **************** //
 
-// ************************ PLUGINS ************************ //
+// ******************* INSTANT METHONDS ******************* //
+userSchema.methods.signToken = function () {
+  return jwt.sign({ id: this.id }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRES_IN,
+  });
+};
+
+userSchema.methods.isCorrectPassword = async (
+  candidatePassword,
+  userPassword
+) => await bcrypt.compare(candidatePassword, userPassword);
+
+// ******************** STATIC METHODS ******************** //
+userSchema.static('findByEmail', function (email) {
+  return this.findOne({ email });
+});
+
+// ************************ PLUGINS *********************** //
 userSchema.plugin(uniqueValidator, {
   message: 'User with {PATH}:{VALUE} already exists. Please use another value.',
 });

@@ -124,7 +124,11 @@ tourSchema.pre('aggregate', function (next) {
   next();
 });
 
-// ************************ PLUGINS ************************ //
+// ******************* INSTANT METHONDS ******************* //
+
+// ******************** STATIC METHODS ******************** //
+
+// ************************ PLUGINS *********************** //
 tourSchema.plugin(uniqueValidator, {
   message: 'Tour with {PATH}:{VALUE} already exists. Please use another value.',
 });
