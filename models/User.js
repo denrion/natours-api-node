@@ -49,6 +49,7 @@ const userSchema = new mongoose.Schema(
         message: 'Passwords do not match',
       },
     },
+    passwordChangedAt: Date,
   },
   {
     timestamps: true,
@@ -95,6 +96,16 @@ userSchema.methods.isCorrectPassword = async (
   candidatePassword,
   userPassword
 ) => await bcrypt.compare(candidatePassword, userPassword);
+
+// Check if password was changed after the JWT token was sent
+userSchema.methods.isPasswordChangedAfter = function (JWTTimestamp) {
+  if (this.passwordChangedAt) {
+    const changedTimestamp = +this.passwordChangedAt.getTime() / 1000;
+    return JWTTimestamp < new Date(changedTimestamp);
+  }
+
+  return false;
+};
 
 // ******************** STATIC METHODS ******************** //
 userSchema.static('findByEmail', function (email) {
