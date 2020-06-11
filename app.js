@@ -3,6 +3,7 @@ import express from 'express';
 import morgan from 'morgan';
 import path from 'path';
 import globalErrorHandler from './controllers/errorController.js';
+import { authRouter } from './routes/authRoutes.js';
 import { tourRouter } from './routes/tourRoutes.js';
 import { userRouter } from './routes/userRoutes.js';
 import NotImplementedError from './utils/errors/NotImplementedError.js';
@@ -18,6 +19,7 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 // ROUTES
+app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 

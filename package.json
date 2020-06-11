@@ -15,6 +15,7 @@
     "reset": "node ./config/seeder.js --delete"
   },
   "dependencies": {
+    "bcrypt": "^5.0.0",
     "colors": "^1.4.0",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
