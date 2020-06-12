@@ -3,6 +3,7 @@ import express from 'express';
 import mongoSanitize from 'express-mongo-sanitize';
 import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
+import hpp from 'hpp';
 import morgan from 'morgan';
 import path from 'path';
 import xss from 'xss-clean';
@@ -36,6 +37,21 @@ app.use(mongoSanitize());
 
 // Data sanitization agains XSS
 app.use(xss());
+
+// Prevent http parameter polution
+// specify parameters that are allowed to be repeated
+app.use(
+  hpp({
+    whitelist: [
+      'duration',
+      'ratingsAverage',
+      'ratingsQuantity',
+      'maxGroupSize',
+      'difficulty',
+      'price',
+    ],
+  })
+);
 
 // Development logging
 if (process.env.NODE_ENV === 'development') {
