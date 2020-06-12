@@ -66,6 +66,7 @@ const userSchema = new mongoose.Schema(
     passwordChangedAt: Date,
     passwordResetToken: String,
     passwordResetExpires: Date,
+    isActive: { type: Boolean, default: true, select: false },
   },
   {
     timestamps: true,
@@ -98,7 +99,12 @@ userSchema.pre('save', function (next) {
 
   next();
 });
+
 // ******************** QUERY MIDDLEWARE ******************* //
+userSchema.pre(/^find/, function (next) {
+  this.find({ isActive: { $ne: false } });
+  next();
+});
 
 // **************** AGGREGATION MIDDLEWARE **************** //
 

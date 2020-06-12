@@ -13,6 +13,7 @@ import ResponseStatus from '../utils/responseStatus.js';
 // @route     POST /api/v1/auth/signup
 // @access    Public
 export const singup = catchAsync(async (req, res, next) => {
+  // Prevent chaning the default user role on signup
   // eslint-disable-next-line no-unused-vars
   const { role, photo, ...signupData } = req.body;
 
