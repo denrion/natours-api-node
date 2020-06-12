@@ -1,5 +1,7 @@
 import dotenv from 'dotenv';
 import express from 'express';
+import rateLimit from 'express-rate-limit';
+import helmet from 'helmet';
 import morgan from 'morgan';
 import path from 'path';
 import globalErrorHandler from './controllers/errorController.js';
@@ -12,8 +14,22 @@ dotenv.config();
 
 const app = express();
 
-app.use(express.json());
+// Set security HTTP headers
+app.use(helmet());
 
+// Rate limiting - for stopping BRUTE FORCE attacks from the same IP
+const limiter = rateLimit({
+  max: process.env.RATE_LIMIT_MAX_NUM_CONNECTIONS,
+  windowMs: process.env.RATE_LIMIT_KEEP_IN_MEMORY_LENGTH_MS,
+  message: process.env.RATE_LIMIT_MESSAGE,
+});
+
+app.use('/api', limiter);
+
+// Body Parser, reading data from body into req.body
+app.use(express.json({ limit: process.env.BODY_PARSER_SIZE_LIMIT }));
+
+// Development logging
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
