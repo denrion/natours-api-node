@@ -90,13 +90,14 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
-// userSchema.pre('save', function (next) {
-//   if (!this.isModified('password') || this.isNew) return next();
+userSchema.pre('save', function (next) {
+  if (!this.isModified('password') || this.isNew) return next();
 
-//   this.passwordChangedAt = Date.now() - 1000;
+  // Add -1000, because saving to DB is sometimes slower than sending JWT
+  this.passwordChangedAt = Date.now() - 1000;
 
-//   next();
-// });
+  next();
+});
 // ******************** QUERY MIDDLEWARE ******************* //
 
 // **************** AGGREGATION MIDDLEWARE **************** //
@@ -112,15 +113,6 @@ userSchema.methods.isCorrectPassword = async (
   candidatePassword,
   userPassword
 ) => await bcrypt.compare(candidatePassword, userPassword);
-
-userSchema.pre('save', function (next) {
-  if (!this.isModified('password') || this.isNew) return next();
-
-  // Add -1000, because saving to DB is sometimes slower than sending JWT
-  this.passwordChangedAt = new Date(Date.now() - 1000);
-
-  next();
-});
 
 // Check if password was changed after the JWT token was sent
 userSchema.methods.isPasswordChangedAfter = function (JWTTimestamp) {

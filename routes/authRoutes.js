@@ -5,7 +5,7 @@ import {
   login,
   resetPassword,
   singup,
-  updatePassword,
+  updateMyPassword,
 } from '../controllers/authController.js';
 import isAuth from '../middleware/isAuth.js';
 
@@ -20,6 +20,6 @@ router.patch('/resetPassword/:token', resetPassword);
 router.use(isAuth);
 
 router.get('/me', getMe);
-router.patch('/updateMyPassword', updatePassword);
+router.patch('/updateMyPassword', updateMyPassword);
 
 export { router as authRouter };

@@ -129,7 +129,7 @@ export const resetPassword = catchAsync(async (req, res, next) => {
 // @desc      Update Password of currently logged in user
 // @route     PATCH /api/v1/auth/updateMyPassword
 // @access    Private
-export const updatePassword = catchAsync(async (req, res, next) => {
+export const updateMyPassword = catchAsync(async (req, res, next) => {
   // 1) Get user from DB by ID from req.user object set by isAuth middleware
   const user = await User.findById(req.user.id).select('+password');
 
