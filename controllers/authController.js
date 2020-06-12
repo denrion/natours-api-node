@@ -38,6 +38,18 @@ export const login = catchAsync(async (req, res, next) => {
   createAndSendToken(user, status.OK, res);
 });
 
+// @desc      Get Current Logged In user
+// @route     GET /api/v1/auth/me
+// @access    Private
+export const getMe = catchAsync(async (req, res, next) => {
+  const user = await User.findById(req.user.id);
+
+  res.status(status.OK).json({
+    success: ResponseStatus.SUCCESS,
+    data: { user },
+  });
+});
+
 // @desc      Forgot Password
 // @route     POST /api/v1/auth/forgotPassword
 // @access    Public
@@ -111,5 +123,33 @@ export const resetPassword = catchAsync(async (req, res, next) => {
   await user.save();
 
   // 3) Log the user in, send JWT to client
+  createAndSendToken(user, status.OK, res);
+});
+
+// @desc      Update Password of currently logged in user
+// @route     PATCH /api/v1/auth/updateMyPassword
+// @access    Private
+export const updatePassword = catchAsync(async (req, res, next) => {
+  // 1) Get user from DB by ID from req.user object set by isAuth middleware
+  const user = await User.findById(req.user.id).select('+password');
+
+  // 2a) Check if sent current password is correct
+  const { oldPassword, newPassword, passwordConfirm } = req.body;
+
+  if (!user || !(await user.isCorrectPassword(oldPassword, user.password)))
+    return next(new UnauthorizedError('Invalid password'));
+
+  // 2b) Check if new password is not the same as old password
+  if (newPassword === oldPassword)
+    return next(
+      new BadRequestError('New password cannot be the same as old password')
+    );
+
+  // 3) if so, update password
+  user.password = newPassword;
+  user.passwordConfirm = passwordConfirm;
+  await user.save();
+
+  // 4) Log user in, send JWT
   createAndSendToken(user, status.OK, res);
 });
