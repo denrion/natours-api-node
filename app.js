@@ -1,9 +1,11 @@
 import dotenv from 'dotenv';
 import express from 'express';
+import mongoSanitize from 'express-mongo-sanitize';
 import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import path from 'path';
+import xss from 'xss-clean';
 import globalErrorHandler from './controllers/errorController.js';
 import { authRouter } from './routes/authRoutes.js';
 import { tourRouter } from './routes/tourRoutes.js';
@@ -28,6 +30,12 @@ app.use('/api', limiter);
 
 // Body Parser, reading data from body into req.body
 app.use(express.json({ limit: process.env.BODY_PARSER_SIZE_LIMIT }));
+
+// Data sanitization against NoSQL query injection
+app.use(mongoSanitize());
+
+// Data sanitization agains XSS
+app.use(xss());
 
 // Development logging
 if (process.env.NODE_ENV === 'development') {

@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import uniqueValidator from 'mongoose-unique-validator';
 import slugify from 'slugify';
+import { sanitizeMongoFields } from '../utils/sanitizeModel.js';
 
 const tourSchema = new mongoose.Schema(
   {
@@ -132,6 +133,8 @@ tourSchema.pre('aggregate', function (next) {
 tourSchema.plugin(uniqueValidator, {
   message: 'Tour with {PATH}:{VALUE} already exists. Please use another value.',
 });
+
+tourSchema.plugin(sanitizeMongoFields);
 
 const Tour = mongoose.model('Tour', tourSchema);
 

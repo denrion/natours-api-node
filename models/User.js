@@ -3,6 +3,10 @@ import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 import mongoose from 'mongoose';
 import uniqueValidator from 'mongoose-unique-validator';
+import {
+  sanitizeMongoFields,
+  sanitizeSpecifiedFields,
+} from '../utils/sanitizeModel.js';
 
 export const Role = Object.freeze({
   ADMIN: 'admin',
@@ -70,7 +74,6 @@ const userSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-    toJSON: { virtuals: true },
     toObject: { virtuals: true },
   }
 );
@@ -153,6 +156,16 @@ userSchema.static('findByEmail', function (email) {
 userSchema.plugin(uniqueValidator, {
   message: 'User with {PATH}:{VALUE} already exists. Please use another value.',
 });
+
+userSchema.plugin(sanitizeMongoFields);
+userSchema.plugin(sanitizeSpecifiedFields, [
+  'password',
+  'passwordConfirm',
+  'passwordChangedAt',
+  'passwordResetToken',
+  'passwordResetExpires',
+  'isActive',
+]);
 
 const User = mongoose.model('User', userSchema);
 
