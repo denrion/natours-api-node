@@ -3,6 +3,13 @@ import jwt from 'jsonwebtoken';
 import mongoose from 'mongoose';
 import uniqueValidator from 'mongoose-unique-validator';
 
+const Role = Object.freeze({
+  ADMIN: 'admin',
+  USER: 'user',
+  GUIDE: 'guide',
+  LEAD_GUIDE: 'lead-guide',
+});
+
 const userSchema = new mongoose.Schema(
   {
     name: {
@@ -21,6 +28,12 @@ const userSchema = new mongoose.Schema(
         /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
         'Please provide a valid email',
       ],
+    },
+    role: {
+      type: String,
+      enum: Object.values(Role),
+      default: Role.USER,
+      required: true,
     },
     photo: String,
     password: {
