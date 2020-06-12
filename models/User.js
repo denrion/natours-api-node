@@ -1,9 +1,10 @@
 import bcrypt from 'bcrypt';
+import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 import mongoose from 'mongoose';
 import uniqueValidator from 'mongoose-unique-validator';
 
-const Role = Object.freeze({
+export const Role = Object.freeze({
   ADMIN: 'admin',
   USER: 'user',
   GUIDE: 'guide',
@@ -63,6 +64,8 @@ const userSchema = new mongoose.Schema(
       },
     },
     passwordChangedAt: Date,
+    passwordResetToken: String,
+    passwordResetExpires: Date,
   },
   {
     timestamps: true,
@@ -110,6 +113,15 @@ userSchema.methods.isCorrectPassword = async (
   userPassword
 ) => await bcrypt.compare(candidatePassword, userPassword);
 
+userSchema.pre('save', function (next) {
+  if (!this.isModified('password') || this.isNew) return next();
+
+  // Add -1000, because saving to DB is sometimes slower than sending JWT
+  this.passwordChangedAt = new Date(Date.now() - 1000);
+
+  next();
+});
+
 // Check if password was changed after the JWT token was sent
 userSchema.methods.isPasswordChangedAfter = function (JWTTimestamp) {
   if (this.passwordChangedAt) {
@@ -118,6 +130,20 @@ userSchema.methods.isPasswordChangedAfter = function (JWTTimestamp) {
   }
 
   return false;
+};
+
+userSchema.methods.createPasswordResetToken = function () {
+  const resetToken = crypto.randomBytes(32).toString('hex');
+
+  this.passwordResetToken = crypto
+    .createHash('sha256')
+    .update(resetToken)
+    .digest('hex');
+
+  // 10 minutes
+  this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
+
+  return resetToken;
 };
 
 // ******************** STATIC METHODS ******************** //

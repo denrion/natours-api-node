@@ -11,6 +11,7 @@ import {
 } from '../controllers/tourController.js';
 import isAuth from '../middleware/isAuth.js';
 import restrictTo from '../middleware/restrictTo.js';
+import { Role } from '../models/User.js';
 
 const router = express.Router();
 
@@ -24,6 +25,6 @@ router
   .route('/:id')
   .get(getTour)
   .patch(updateTour)
-  .delete(isAuth, restrictTo('admin', 'lead-guide'), deleteTour);
+  .delete(isAuth, restrictTo(Role.ADMIN, Role.LEAD_GUIDE), deleteTour);
 
 export { router as tourRouter };
