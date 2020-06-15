@@ -1,7 +1,22 @@
 import mongoose from 'mongoose';
 import uniqueValidator from 'mongoose-unique-validator';
 import slugify from 'slugify';
-import { sanitizeMongoFields } from '../utils/sanitizeModel.js';
+import {
+  sanitizeMongoFields,
+  sanitizeSpecifiedFields,
+} from '../utils/sanitizeModel.js';
+
+const locationSchema = new mongoose.Schema({
+  type: {
+    type: String,
+    default: 'Point',
+    enum: ['Point'],
+  },
+  coordinates: [Number],
+  address: String,
+  description: String,
+  day: Number,
+});
 
 const tourSchema = new mongoose.Schema(
   {
@@ -77,10 +92,17 @@ const tourSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    startLocation: locationSchema,
+    locations: [locationSchema],
+    guides: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: 'User',
+      },
+    ],
   },
   {
     timestamps: true,
-    toJSON: { virtuals: true },
     toObject: { virtuals: true },
   }
 );
@@ -97,27 +119,16 @@ tourSchema.pre('save', function (next) {
   next();
 });
 
-// tourSchema.pre('save', function (next) {
-//   console.log('Will save document...');
-//   next();
-// });
-
-// tourSchema.post('save', function (doc, next) {
-//   console.log(doc);
-//   next();
-// });
-
 // ******************** QUERY MIDDLEWARE ******************* //
 tourSchema.pre(/^find/, function (next) {
   this.find({ secretTour: { $ne: true } });
-  // this.start = Date.now();
   next();
 });
 
-// tourSchema.post(/^find/, function (doc, next) {
-//   console.log(`Query took ${Date.now() - this.start} milliseconds`);
-//   next();
-// });
+tourSchema.pre(/^find/, function (next) {
+  this.populate('guides');
+  next();
+});
 
 // **************** AGGREGATION MIDDLEWARE **************** //
 tourSchema.pre('aggregate', function (next) {
@@ -135,6 +146,7 @@ tourSchema.plugin(uniqueValidator, {
 });
 
 tourSchema.plugin(sanitizeMongoFields);
+tourSchema.plugin(sanitizeSpecifiedFields, ['secretTour']);
 
 const Tour = mongoose.model('Tour', tourSchema);
 

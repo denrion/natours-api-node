@@ -30,9 +30,7 @@ export const sanitizeSpecifiedFields = (schema, fieldsToExclude = []) => {
   schema.methods.toJSON = function () {
     const json = toJSON.apply(this, arguments);
 
-    fieldsToExclude.forEach((el) => {
-      if (json[el]) delete json[el];
-    });
+    fieldsToExclude.forEach((el) => delete json[el]);
 
     return json;
   };

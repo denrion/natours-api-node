@@ -12,10 +12,7 @@ dotenv.config();
 connectMongoDB();
 
 const tours = JSON.parse(
-  fs.readFileSync(
-    path.resolve('dev-data', 'data', 'tours-simple.json'),
-    'utf-8'
-  )
+  fs.readFileSync(path.resolve('dev-data', 'data', 'tours.json'), 'utf-8')
 );
 
 const users = JSON.parse(
