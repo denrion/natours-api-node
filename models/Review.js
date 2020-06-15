@@ -35,6 +35,14 @@ const reviewSchema = new mongoose.Schema(
 // ******************* DOCUMENT MIDDLEWARE ****************** //
 
 // ******************** QUERY MIDDLEWARE ******************* //
+reviewSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: 'user',
+    select: 'name photo',
+  });
+
+  next();
+});
 
 // **************** AGGREGATION MIDDLEWARE **************** //
 
