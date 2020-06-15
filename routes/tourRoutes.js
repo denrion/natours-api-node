@@ -12,11 +12,13 @@ import {
 import isAuth from '../middleware/isAuth.js';
 import restrictTo from '../middleware/restrictTo.js';
 import { Role } from '../models/User.js';
+import { reviewRouter } from './reviewRoutes.js';
 
 const router = express.Router();
 
-router.route('/top-5-cheap').get(aliasTopTours, getAllTours);
+router.use('/:tourId/reviews', reviewRouter);
 
+router.route('/top-5-cheap').get(aliasTopTours, getAllTours);
 router.route('/tour-stats').get(getTourStats);
 router.route('/monthly-plan/:year').get(getMontlyPlan);
 
