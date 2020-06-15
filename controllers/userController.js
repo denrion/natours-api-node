@@ -4,6 +4,13 @@ import User from '../models/User.js';
 import catchAsync from '../utils/catchAsync.js';
 import filterReqBody from '../utils/filterReqBody.js';
 import ResponseStatus from '../utils/responseStatus.js';
+import {
+  createOne,
+  deleteOne,
+  getAll,
+  getOne,
+  updateOne,
+} from './handlerFactory.js';
 
 // @desc      Update currently logged in user
 // @route     PATCH /api/v1/users/updateMe
@@ -42,39 +49,27 @@ export const deleteMe = catchAsync(async (req, res, next) => {
   });
 });
 
-export const getAllUsers = async (req, res, next) => {
-  const users = await User.find();
+// @desc      Get All Users
+// @route     GET /api/v1/users
+// @access    Private
+export const getAllUsers = getAll(User);
 
-  res.status(200).json({
-    status: ResponseStatus.SUCCESS,
-    data: { users },
-  });
-};
+// @desc      Get User By Id
+// @route     GET /api/v1/users/:userId
+// @access    Private
+export const getUser = getOne(User);
 
-export const createUser = (req, res, next) => {
-  res.status(500).json({
-    status: ResponseStatus.FAILURE,
-    message: 'Route not yet implemented',
-  });
-};
+// @desc      Create New User
+// @route     POST /api/v1/users
+// @access    Private
+export const createUser = createOne(User);
 
-export const getUser = (req, res, next) => {
-  res.status(500).json({
-    status: ResponseStatus.FAILURE,
-    message: 'Route not yet implemented',
-  });
-};
+// @desc      Update user
+// @route     PATHS /api/v1/users/:userId
+// @access    Private
+export const updateUser = updateOne(User);
 
-export const updateUser = (req, res, next) => {
-  res.status(500).json({
-    status: ResponseStatus.FAILURE,
-    message: 'Route not yet implemented',
-  });
-};
-
-export const deleteUser = (req, res, next) => {
-  res.status(500).json({
-    status: ResponseStatus.FAILURE,
-    message: 'Route not yet implemented',
-  });
-};
+// @desc      Delete User
+// @route     DELETE /api/v1/users/:userId
+// @access    Private
+export const deleteUser = deleteOne(User);

@@ -1,9 +1,14 @@
 import Tour from '../models/Tour.js';
-import APIFeatures from '../utils/APIFeatures.js';
 import catchAsync from '../utils/catchAsync.js';
 import InternalServerError from '../utils/errors/InternalServerError.js';
-import NotFoundError from '../utils/errors/NotFoundError.js';
 import ResponseStatus from '../utils/responseStatus.js';
+import {
+  createOne,
+  deleteOne,
+  getAll,
+  getOne,
+  updateOne,
+} from './handlerFactory.js';
 
 // @desc      Get Top 5 Cheapest Tours - ALIAS
 // @route     GET /api/v1/tours?sort=-ratingsAverage,price&limit=5
@@ -19,76 +24,27 @@ export const aliasTopTours = (req, res, next) => {
 // @desc      Get All Tours
 // @route     GET /api/v1/tours
 // @access    Public
-export const getAllTours = catchAsync(async (req, res, next) => {
-  const features = new APIFeatures(Tour.find(), req.query)
-    .filter()
-    .sort()
-    .limitFields()
-    .paginate();
-
-  const tours = await features.query;
-
-  res.status(200).json({
-    status: ResponseStatus.SUCCESS,
-    results: tours.length,
-    data: { tours },
-  });
-});
+export const getAllTours = getAll(Tour);
 
 // @desc      Get Tour By Id
 // @route     GET /api/v1/tours/:tourId
 // @access    Public
-export const getTour = catchAsync(async (req, res, next) => {
-  const tour = await Tour.findById(req.params.id).populate('reviews');
-
-  if (!tour)
-    return next(new NotFoundError('No document found with the specified id'));
-
-  res.status(200).json({ status: ResponseStatus.SUCCESS, data: { tour } });
-});
+export const getTour = getOne(Tour, { path: 'reviews' });
 
 // @desc      Create New Tour
 // @route     POST /api/v1/tours
 // @access    Public
-export const createTour = catchAsync(async (req, res, next) => {
-  const tour = await Tour.create(req.body);
-
-  if (!tour)
-    return next(
-      new InternalServerError(
-        'Error occured while creating a document. Please, try again.'
-      )
-    );
-
-  res.status(201).json({ status: ResponseStatus.SUCCESS, data: { tour } });
-});
+export const createTour = createOne(Tour);
 
 // @desc      Update tour
 // @route     PATHS /api/v1/tours/:tourId
 // @access    Public
-export const updateTour = catchAsync(async (req, res, next) => {
-  const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-    runValidators: true,
-  });
-
-  if (!tour)
-    return next(new NotFoundError('No document found with the specified id'));
-
-  res.status(200).json({ status: ResponseStatus.SUCCESS, data: { tour } });
-});
+export const updateTour = updateOne(Tour);
 
 // @desc      Delete tour
 // @route     DELETE /api/v1/tours/:tourId
-// @access    Public
-export const deleteTour = catchAsync(async (req, res, next) => {
-  const tour = await Tour.findByIdAndDelete(req.params.id);
-
-  if (!tour)
-    return next(new NotFoundError('No document found with the specified id'));
-
-  res.status(204).json({ status: ResponseStatus.SUCCESS, data: null });
-});
+// @access    Private
+export const deleteTour = deleteOne(Tour);
 
 // @desc      Get Tour Stats
 // @route     GET /api/v1/tours/tour-stats
