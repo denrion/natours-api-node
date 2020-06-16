@@ -32,6 +32,10 @@ router
     setBodyFieldFromAuthUser('user'),
     createReview
   );
-router.route('/:id').get(getReview).patch(updateReview).delete(deleteReview);
+router
+  .route('/:id')
+  .get(getReview)
+  .patch(restrictTo(Role.ADMIN, Role.USER), updateReview)
+  .delete(restrictTo(Role.ADMIN, Role.USER), deleteReview);
 
 export { router as reviewRouter };

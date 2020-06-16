@@ -20,13 +20,22 @@ router.use('/:tourId/reviews', reviewRouter);
 
 router.route('/top-5-cheap').get(aliasTopTours, getAllTours);
 router.route('/tour-stats').get(getTourStats);
-router.route('/monthly-plan/:year').get(getMontlyPlan);
+router
+  .route('/monthly-plan/:year')
+  .get(
+    isAuth,
+    restrictTo(Role.ADMIN, Role.LEAD_GUIDE, Role.GUIDE),
+    getMontlyPlan
+  );
 
-router.route('/').get(isAuth, getAllTours).post(createTour);
+router
+  .route('/')
+  .get(getAllTours)
+  .post(isAuth, restrictTo(Role.ADMIN, Role.LEAD_GUIDE), createTour);
 router
   .route('/:id')
   .get(getTour)
-  .patch(updateTour)
+  .patch(isAuth, restrictTo(Role.ADMIN, Role.LEAD_GUIDE), updateTour)
   .delete(isAuth, restrictTo(Role.ADMIN, Role.LEAD_GUIDE), deleteTour);
 
 export { router as tourRouter };
