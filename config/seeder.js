@@ -3,6 +3,7 @@ import colors from 'colors';
 import dotenv from 'dotenv';
 import fs from 'fs';
 import path from 'path';
+import Review from '../models/Review.js';
 import Tour from '../models/Tour.js';
 import User from '../models/User.js';
 import connectMongoDB from './connectMongoDB.js';
@@ -14,9 +15,11 @@ connectMongoDB();
 const tours = JSON.parse(
   fs.readFileSync(path.resolve('dev-data', 'data', 'tours.json'), 'utf-8')
 );
-
 const users = JSON.parse(
   fs.readFileSync(path.resolve('dev-data', 'data', 'users.json'), 'utf-8')
+);
+const reviews = JSON.parse(
+  fs.readFileSync(path.resolve('dev-data', 'data', 'reviews.json'), 'utf-8')
 );
 
 // IMPORT DATA INTO DB
@@ -24,6 +27,7 @@ const importData = async () => {
   try {
     await Tour.create(tours);
     await User.create(users, { validateBeforeSave: false });
+    await Review.create(reviews);
     console.log(colors.green.inverse('Data successfuly imported'));
   } catch (error) {
     console.error(colors.red(error));
@@ -36,6 +40,7 @@ const deleteData = async () => {
   try {
     await Tour.deleteMany({});
     await User.deleteMany({});
+    await Review.deleteMany({});
     console.log(colors.red.inverse('Data successfuly deleted'));
   } catch (error) {
     console.error(colors.red(error));
