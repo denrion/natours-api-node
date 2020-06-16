@@ -1,10 +1,12 @@
 import express from 'express';
 import {
+  deleteMe,
   forgotPassword,
   getMe,
   login,
   resetPassword,
   singup,
+  updateMe,
   updateMyPassword,
 } from '../controllers/authController.js';
 import isAuth from '../middleware/isAuth.js';
@@ -20,6 +22,8 @@ router.patch('/resetPassword/:token', resetPassword);
 router.use(isAuth);
 
 router.get('/me', getMe);
+router.patch('/updateMe', updateMe);
 router.patch('/updateMyPassword', updateMyPassword);
+router.delete('/deleteMe', deleteMe);
 
 export { router as authRouter };

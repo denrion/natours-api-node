@@ -7,6 +7,7 @@ import sendEmail from '../utils/email/sendEmail.js';
 import BadRequestError from '../utils/errors/BadRequestError.js';
 import InternalServerError from '../utils/errors/InternalServerError.js';
 import UnauthorizedError from '../utils/errors/UnauthorizedError.js';
+import filterReqBody from '../utils/filterReqBody.js';
 import ResponseStatus from '../utils/responseStatus.js';
 
 // @desc      Signup user
@@ -37,18 +38,6 @@ export const login = catchAsync(async (req, res, next) => {
     return next(new UnauthorizedError('Invalid credentials'));
 
   createAndSendToken(user, status.OK, res);
-});
-
-// @desc      Get Current Logged In user
-// @route     GET /api/v1/auth/me
-// @access    Private
-export const getMe = catchAsync(async (req, res, next) => {
-  const user = await User.findById(req.user.id);
-
-  res.status(status.OK).json({
-    success: ResponseStatus.SUCCESS,
-    data: { user },
-  });
 });
 
 // @desc      Forgot Password
@@ -127,6 +116,36 @@ export const resetPassword = catchAsync(async (req, res, next) => {
   createAndSendToken(user, status.OK, res);
 });
 
+// @desc      Get Current Logged In user
+// @route     GET /api/v1/auth/me
+// @access    Private
+export const getMe = catchAsync(async (req, res, next) => {
+  const user = await User.findById(req.user.id);
+
+  res.status(status.OK).json({
+    success: ResponseStatus.SUCCESS,
+    data: { user },
+  });
+});
+
+// @desc      Update currently logged in user
+// @route     PATCH /api/v1/auth/updateMe
+// @access    Private
+export const updateMe = catchAsync(async (req, res, next) => {
+  // Only allow update for specified fields
+  const filteredBody = filterReqBody(req.body, 'name', 'email');
+
+  const updatedUser = await User.findByIdAndUpdate(req.user.id, filteredBody, {
+    new: true,
+    runValidators: true,
+  });
+
+  res.status(status.OK).json({
+    status: ResponseStatus.SUCCESS,
+    data: { updatedUser },
+  });
+});
+
 // @desc      Update Password of currently logged in user
 // @route     PATCH /api/v1/auth/updateMyPassword
 // @access    Private
@@ -153,4 +172,23 @@ export const updateMyPassword = catchAsync(async (req, res, next) => {
 
   // 4) Log user in, send JWT
   createAndSendToken(user, status.OK, res);
+});
+
+// @desc      "Delete" currently logged in user
+// @route     PATCH /api/v1/auth/deleteMe
+// @access    Private
+export const deleteMe = catchAsync(async (req, res, next) => {
+  await User.findByIdAndUpdate(
+    req.user.id,
+    { isActive: false },
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
+
+  res.status(status.NO_CONTENT).json({
+    status: ResponseStatus.SUCCESS,
+    data: null,
+  });
 });
