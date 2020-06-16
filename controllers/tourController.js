@@ -1,5 +1,7 @@
+import status from 'http-status';
 import Tour from '../models/Tour.js';
 import catchAsync from '../utils/catchAsync.js';
+import BadRequestError from '../utils/errors/BadRequestError.js';
 import InternalServerError from '../utils/errors/InternalServerError.js';
 import ResponseStatus from '../utils/responseStatus.js';
 import {
@@ -118,5 +120,34 @@ export const getMontlyPlan = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: ResponseStatus.SUCCESS,
     data: { plan },
+  });
+});
+
+// @desc      Get Tours Within Specified Distance
+// @route     GET /api/v1/tours/tours-within/distance/:distance/center/:latlng/unit/:unit
+// @access    Public
+export const getToursWithin = catchAsync(async (req, res, next) => {
+  const { distance, latlng, unit } = req.params;
+  const [lat, lng] = latlng.split(',');
+
+  if (!lat || !lng)
+    return next(
+      new BadRequestError(
+        'Please provide latitude and longitude in the format: lat,lng'
+      )
+    );
+
+  const EARTH_RADIUS_MI = 3963.2;
+  const EARTH_RADIUS_KM = 6378.1;
+  const radius = distance / (unit === 'mi' ? EARTH_RADIUS_MI : EARTH_RADIUS_KM);
+
+  const tours = await Tour.find({
+    startLocation: { $geoWithin: { $centerSphere: [[lng, lat], radius] } },
+  });
+
+  res.status(status.OK).json({
+    status: ResponseStatus.SUCCESS,
+    results: tours.length,
+    data: { tours },
   });
 });

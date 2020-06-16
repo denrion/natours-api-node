@@ -7,6 +7,7 @@ import {
   getMontlyPlan,
   getTour,
   getTourStats,
+  getToursWithin,
   updateTour,
 } from '../controllers/tourController.js';
 import isAuth from '../middleware/isAuth.js';
@@ -27,6 +28,10 @@ router
     restrictTo(Role.ADMIN, Role.LEAD_GUIDE, Role.GUIDE),
     getMontlyPlan
   );
+
+router
+  .route('/tours-within/:distance/center/:latlng/unit/:unit')
+  .get(getToursWithin);
 
 router
   .route('/')
