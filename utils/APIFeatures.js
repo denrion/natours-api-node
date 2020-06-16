@@ -1,3 +1,5 @@
+import BadRequestError from './errors/BadRequestError.js';
+
 class APIFeatures {
   constructor(query, queryString) {
     this.query = query;
@@ -47,11 +49,41 @@ class APIFeatures {
     const limit = +this.queryString.limit || 100;
     const skip = (page - 1) * limit;
 
-    if (page <= 0) throw new Error('Not allowed to request negative pages');
+    if (page <= 0)
+      throw new BadRequestError('Not allowed to request negative pages');
 
     this.query = this.query.skip(skip).limit(limit);
+    this.paginationLinks = { page, limit };
 
     return this;
+  }
+
+  createPaginationLinks(total) {
+    if (!this.paginationLinks)
+      throw new BadRequestError('No pagination information provided');
+
+    const { page, limit } = this.paginationLinks;
+
+    const startIndex = (page - 1) * limit;
+    const endIndex = page * limit;
+
+    const pagination = {};
+
+    if (endIndex < total) {
+      pagination.next = {
+        page: page + 1,
+        limit,
+      };
+    }
+
+    if (startIndex > 0) {
+      pagination.prev = {
+        page: page - 1,
+        limit,
+      };
+    }
+
+    return pagination;
   }
 }
 

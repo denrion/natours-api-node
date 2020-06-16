@@ -23,6 +23,7 @@
     "no-restricted-imports": "off",
     "import/extensions": ["error", "always", { "ignorePackages": true }],
     "import/prefer-default-export": "off",
-    "no-shadow": "off"
+    "no-shadow": "off",
+    "no-nested-ternary": "off"
   }
 }

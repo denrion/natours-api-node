@@ -3,6 +3,8 @@ import APIFeatures from '../utils/APIFeatures.js';
 import catchAsync from '../utils/catchAsync.js';
 import InternalServerError from '../utils/errors/InternalServerError.js';
 import NotFoundError from '../utils/errors/NotFoundError.js';
+import lowercaseFirstLetter from '../utils/helpers/lowercaseFirstLetter.js';
+import setCorrectPluralSuffix from '../utils/helpers/setCorrectPluralSuffix.js';
 import ResponseStatus from '../utils/responseStatus.js';
 
 export const getAll = (Model) =>
@@ -18,11 +20,18 @@ export const getAll = (Model) =>
       .paginate();
 
     const documents = await features.query;
+    const totalResults = await Model.countDocuments();
 
     res.status(status.OK).json({
       status: ResponseStatus.SUCCESS,
-      results: documents.length,
-      data: { [Model.modelName]: documents },
+      returnedResults: documents.length,
+      totalResults,
+      pagination: features.createPaginationLinks(totalResults),
+      data: {
+        [setCorrectPluralSuffix(
+          lowercaseFirstLetter(Model.modelName)
+        )]: documents,
+      },
     });
   });
 
@@ -39,7 +48,11 @@ export const getOne = (Model, populateOptions) =>
 
     res.status(status.OK).json({
       status: ResponseStatus.SUCCESS,
-      data: { [Model.modelName]: document },
+      data: {
+        [setCorrectPluralSuffix(
+          lowercaseFirstLetter(Model.modelName)
+        )]: document,
+      },
     });
   });
 
@@ -56,7 +69,11 @@ export const createOne = (Model) =>
 
     res.status(status.CREATED).json({
       status: ResponseStatus.SUCCESS,
-      data: { [Model.modelName]: document },
+      data: {
+        [setCorrectPluralSuffix(
+          lowercaseFirstLetter(Model.modelName)
+        )]: document,
+      },
     });
   });
 
@@ -72,7 +89,11 @@ export const updateOne = (Model) =>
 
     res.status(status.OK).json({
       status: ResponseStatus.SUCCESS,
-      data: { [Model.modelName]: document },
+      data: {
+        [setCorrectPluralSuffix(
+          lowercaseFirstLetter(Model.modelName)
+        )]: document,
+      },
     });
   });
 
