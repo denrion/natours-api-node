@@ -151,3 +151,41 @@ export const getToursWithin = catchAsync(async (req, res, next) => {
     data: { tours },
   });
 });
+
+// @desc      Get Distances To Tours From Point
+// @route     GET /api/v1/tours/distances/:latlng/unit/:unit
+// @access    Public
+export const getDistances = catchAsync(async (req, res, next) => {
+  const { latlng, unit } = req.params;
+  const [lat, lng] = latlng.split(',');
+
+  if (!lat || !lng)
+    return next(
+      new BadRequestError(
+        'Please provide latitude and longitude in the format: lat,lng'
+      )
+    );
+
+  const MULTIPLIER = unit === 'mi' ? 0.000621371 : 0.001;
+
+  const distances = await Tour.aggregate([
+    {
+      $geoNear: {
+        near: {
+          type: 'Point',
+          coordinates: [+lng, +lat],
+        },
+        distanceField: 'distance',
+        distanceMultiplier: MULTIPLIER,
+      },
+    },
+    {
+      $project: { distance: 1, name: 1 },
+    },
+  ]);
+
+  res.status(status.OK).json({
+    status: ResponseStatus.SUCCESS,
+    data: { distances },
+  });
+});

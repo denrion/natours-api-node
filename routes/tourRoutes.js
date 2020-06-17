@@ -4,6 +4,7 @@ import {
   createTour,
   deleteTour,
   getAllTours,
+  getDistances,
   getMontlyPlan,
   getTour,
   getTourStats,
@@ -28,6 +29,8 @@ router
     restrictTo(Role.ADMIN, Role.LEAD_GUIDE, Role.GUIDE),
     getMontlyPlan
   );
+
+router.route('/distances/:latlng/unit/:unit').get(getDistances);
 
 router
   .route('/tours-within/:distance/center/:latlng/unit/:unit')
