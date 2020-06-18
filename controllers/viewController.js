@@ -14,5 +14,5 @@ export const getTour = catchAsync(async (req, res, next) => {
     select: 'review rating user',
   });
 
-  res.status(status.OK).render('tour', { title: tour.name, tour });
+  res.status(status.OK).render('tour', { title: `${tour.name} Tour`, tour });
 });
