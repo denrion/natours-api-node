@@ -4,6 +4,7 @@ import {
   forgotPassword,
   getMe,
   login,
+  logout,
   resetPassword,
   singup,
   updateMe,
@@ -15,6 +16,7 @@ const router = express.Router();
 
 router.post('/signup', singup);
 router.post('/login', login);
+router.get('/logout', logout);
 router.post('/forgotPassword', forgotPassword);
 router.patch('/resetPassword/:token', resetPassword);
 

@@ -1,3 +1,5 @@
+import cookieParser from 'cookie-parser';
+import cors from 'cors';
 import dotenv from 'dotenv';
 import express from 'express';
 import mongoSanitize from 'express-mongo-sanitize';
@@ -39,6 +41,9 @@ app.use('/api', limiter);
 // Body Parser, reading data from body into req.body
 app.use(express.json({ limit: process.env.BODY_PARSER_SIZE_LIMIT }));
 
+// Cookie Parser, enables reading incoming cookies
+app.use(cookieParser());
+
 // Data sanitization against NoSQL query injection
 app.use(mongoSanitize());
 
@@ -59,6 +64,9 @@ app.use(
     ],
   })
 );
+
+// CORS
+app.use(cors({ credentials: true }));
 
 // Development logging
 if (process.env.NODE_ENV === 'development') {

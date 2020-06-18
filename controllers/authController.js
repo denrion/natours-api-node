@@ -40,6 +40,20 @@ export const login = catchAsync(async (req, res, next) => {
   createAndSendToken(user, status.OK, res);
 });
 
+// @desc      Logout user
+// @route     GET /api/v1/auth/logout
+// @access    Private
+// @usage     Use to "delete" the jwt cookie if using cookies for storing jwt
+export const logout = catchAsync(async (req, res, next) => {
+  res
+    .status(status.OK)
+    .cookie('jwt', 'Logged Out', {
+      expires: new Date(Date.now() + 10 * 1000),
+      httpOnly: true,
+    })
+    .json({ status: ResponseStatus.SUCCESS });
+});
+
 // @desc      Forgot Password
 // @route     POST /api/v1/auth/forgotPassword
 // @access    Public
