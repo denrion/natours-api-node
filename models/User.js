@@ -2,7 +2,6 @@ import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 import mongoose from 'mongoose';
-import uniqueValidator from 'mongoose-unique-validator';
 import {
   sanitizeMongoFields,
   sanitizeSpecifiedFields,
@@ -26,13 +25,18 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: [true, 'Please provide your email'],
       unique: true,
-      uniqueCaseInsensitive: true,
       trim: true,
       lowercase: true,
       match: [
         /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
         'Please provide a valid email',
       ],
+      validate: {
+        // eslint-disable-next-line no-use-before-define
+        validator: async (val) => !(await User.findByEmail(val)),
+        message:
+          'User with {PATH}: {VALUE} already exists. Please use another value.',
+      },
     },
     role: {
       type: String,
@@ -153,9 +157,6 @@ userSchema.static('findByEmail', function (email) {
 });
 
 // ************************ PLUGINS *********************** //
-userSchema.plugin(uniqueValidator, {
-  message: 'User with {PATH}:{VALUE} already exists. Please use another value.',
-});
 
 userSchema.plugin(sanitizeMongoFields);
 userSchema.plugin(sanitizeSpecifiedFields, [
