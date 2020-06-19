@@ -8460,32 +8460,31 @@ var logout = /*#__PURE__*/function () {
       while (1) {
         switch (_context2.prev = _context2.next) {
           case 0:
-            console.log('here');
             url = '/api/v1/auth/logout';
             config = {
               withCredentials: true
             };
-            _context2.prev = 3;
-            _context2.next = 6;
+            _context2.prev = 2;
+            _context2.next = 5;
             return _axios.default.get(url, null, config);
 
-          case 6:
+          case 5:
             res = _context2.sent;
-            if (res.data.status === 'success') location.reload(true);
-            _context2.next = 13;
+            if (res.data.status === 'success') location.assign('/');
+            _context2.next = 12;
             break;
 
-          case 10:
-            _context2.prev = 10;
-            _context2.t0 = _context2["catch"](3);
+          case 9:
+            _context2.prev = 9;
+            _context2.t0 = _context2["catch"](2);
             (0, _alerts.default)('error', 'Error loggoing out! Please, try again');
 
-          case 13:
+          case 12:
           case "end":
             return _context2.stop();
         }
       }
-    }, _callee2, null, [[3, 10]]);
+    }, _callee2, null, [[2, 9]]);
   }));
 
   return function logout() {
@@ -8852,7 +8851,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "51699" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "60386" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

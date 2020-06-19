@@ -43,6 +43,9 @@ const isAuth = catchAsync(async (req, res, next) => {
   // place current user on the request object
   req.user = currentUser;
 
+  // Only for rendered pages
+  res.locals.user = currentUser;
+
   // GRANT ACCESS TO THE PROTECTED ROUTE
   next();
 });

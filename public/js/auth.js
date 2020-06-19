@@ -19,14 +19,12 @@ export const login = async (email, password) => {
 };
 
 export const logout = async () => {
-  console.log('here');
-
   const url = '/api/v1/auth/logout';
   const config = { withCredentials: true };
 
   try {
     const res = await API.get(url, null, config);
-    if (res.data.status === 'success') location.reload(true);
+    if (res.data.status === 'success') location.assign('/');
   } catch (error) {
     showAlert('error', 'Error loggoing out! Please, try again');
   }
