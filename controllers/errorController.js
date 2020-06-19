@@ -1,38 +1,64 @@
+/* eslint-disable no-console */
 import colors from 'colors';
 import status from 'http-status';
 import BadRequestError from '../utils/errors/BadRequestError.js';
 import UnauthorizedError from '../utils/errors/UnauthorizedError.js';
 import ResponseStatus from '../utils/responseStatus.js';
 
-const sendErrorDev = (err, res) => {
-  res.status(err.statusCode).json({
-    status: err.status,
-    message: err.message,
-    error: err,
-    stack: err.stack,
+const sendErrorDev = (err, req, res) => {
+  if (req.originalUrl.startsWith('/api')) {
+    return res.status(err.statusCode).json({
+      status: err.status,
+      message: err.message,
+      error: err,
+      stack: err.stack,
+    });
+  }
+
+  console.error(colors.red('ERROR 💥 %s'), err);
+
+  return res.status(err.statusCode).render('error', {
+    title: 'Something went wrong',
+    msg: err.message,
   });
 };
 
-const sendErrorProd = (err, res) => {
-  // Operational, trusted error: send message to client
-  if (err.isOperational) {
-    res.status(err.statusCode).json({
-      status: err.status,
-      message: err.message,
-    });
+const sendErrorProd = (err, req, res) => {
+  if (req.originalUrl.startsWith('/api')) {
+    // Operational, trusted error: send message to client
+    if (err.isOperational) {
+      return res.status(err.statusCode).json({
+        status: err.status,
+        message: err.message,
+      });
 
-    // Programming or other unknown error: don`t leak the error detals
-  } else {
+      // Programming or other unknown error: don`t leak the error detals
+    }
+
     // 1) Log error: for DEVS
-    // eslint-disable-next-line no-console
     console.error(colors.red('ERROR 💥 %s'), err);
 
     // 2) Send generic message: for CLIENT
-    res.status(status.INTERNAL_SERVER_ERROR).json({
+    return res.status(status.INTERNAL_SERVER_ERROR).json({
       status: ResponseStatus.ERROR,
       message: 'Something went very wrong',
     });
   }
+
+  if (err.isOperational) {
+    return res.status(err.statusCode).render('error', {
+      title: 'Something went wrong',
+      msg: err.message,
+    });
+  }
+
+  console.error(colors.red('ERROR 💥 %s'), err);
+
+  // 2) Send generic message: for CLIENT
+  return res.status(err.statusCode).render('error', {
+    title: 'Something went wrong',
+    msg: 'Server error, please try again later',
+  });
 };
 
 // Handle specific error functions
@@ -63,10 +89,10 @@ const globalErrorHandler = (err, req, res, next) => {
   err.statusCode = err.statusCode || status.INTERNAL_SERVER_ERROR;
   err.status = err.status || ResponseStatus.ERROR;
 
-  let error = { ...err };
+  let error = { ...err, message: err.message };
 
   if (process.env.NODE_ENV === 'development') {
-    sendErrorDev(err, res);
+    sendErrorDev(error, req, res);
   } else if (process.env.NODE_ENV === 'production') {
     if (err.name === 'CastError') error = handleCastErrorDB(err);
     else if (err.code === 11000) error = handleDuplicateFieldsDB(err);
@@ -75,7 +101,7 @@ const globalErrorHandler = (err, req, res, next) => {
     else if (err.name === 'JsonWebTokenError') error = handleJWTError();
     else if (err.name === 'TokenExpiredError') error = handleJWTExpiredError();
 
-    sendErrorProd(error, res);
+    sendErrorProd(error, req, res);
   }
 };
 
