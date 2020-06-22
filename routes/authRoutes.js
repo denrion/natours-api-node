@@ -7,7 +7,7 @@ import {
   logout,
   resetPassword,
   resizeUserPhoto,
-  singup,
+  signup,
   updateMe,
   updateMyPassword,
   uploadUserPhoto,
@@ -16,7 +16,7 @@ import isAuth from '../middleware/isAuth.js';
 
 const router = express.Router();
 
-router.post('/signup', singup);
+router.post('/signup', signup);
 router.post('/login', login);
 router.get('/logout', logout);
 router.post('/forgotPassword', forgotPassword);

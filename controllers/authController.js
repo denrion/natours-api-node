@@ -12,16 +12,6 @@ import UnauthorizedError from '../utils/errors/UnauthorizedError.js';
 import filterReqBody from '../utils/filterReqBody.js';
 import ResponseStatus from '../utils/responseStatus.js';
 
-// const multerStorage = multer.diskStorage({
-//   destination: (req, file, cb) => {
-//     cb(null, 'public/img/users');
-//   },
-//   filename: (req, file, cb) => {
-//     const ext = file.mimetype.split('/')[1];
-//     cb(null, `user-${req.user.id}-${Date.now()}.${ext}`);
-//   },
-// });
-
 const multerStorage = multer.memoryStorage();
 
 const multerFilter = (req, file, cb) => {
@@ -36,24 +26,24 @@ const upload = multer({ storage: multerStorage, fileFilter: multerFilter });
 
 export const uploadUserPhoto = upload.single('photo');
 
-export const resizeUserPhoto = (req, res, next) => {
+export const resizeUserPhoto = catchAsync(async (req, res, next) => {
   if (!req.file) return next();
 
   req.file.filename = `user-${req.user.id}-${Date.now()}.jpeg`;
 
-  sharp(req.file.buffer)
+  await sharp(req.file.buffer)
     .resize(500, 500)
     .toFormat('jpeg')
     .jpeg({ quality: 90 })
     .toFile(`public/img/users/${req.file.filename}`);
 
   next();
-};
+});
 
 // @desc      Signup user
 // @route     POST /api/v1/auth/signup
 // @access    Public
-export const singup = catchAsync(async (req, res, next) => {
+export const signup = catchAsync(async (req, res, next) => {
   // Prevent chaning the default user role on signup
   // eslint-disable-next-line no-unused-vars
   const { role, photo, ...signupData } = req.body;

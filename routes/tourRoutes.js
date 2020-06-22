@@ -9,7 +9,9 @@ import {
   getTour,
   getTourStats,
   getToursWithin,
+  resizeTourImages,
   updateTour,
+  uploadTourImages,
 } from '../controllers/tourController.js';
 import isAuth from '../middleware/isAuth.js';
 import restrictTo from '../middleware/restrictTo.js';
@@ -43,7 +45,13 @@ router
 router
   .route('/:id')
   .get(getTour)
-  .patch(isAuth, restrictTo(Role.ADMIN, Role.LEAD_GUIDE), updateTour)
+  .patch(
+    isAuth,
+    restrictTo(Role.ADMIN, Role.LEAD_GUIDE),
+    uploadTourImages,
+    resizeTourImages,
+    updateTour
+  )
   .delete(isAuth, restrictTo(Role.ADMIN, Role.LEAD_GUIDE), deleteTour);
 
 export { router as tourRouter };
