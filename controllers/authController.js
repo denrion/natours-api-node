@@ -5,7 +5,7 @@ import sharp from 'sharp';
 import User from '../models/User.js';
 import catchAsync from '../utils/catchAsync.js';
 import createAndSendToken from '../utils/createAndSendToken.js';
-import sendEmail from '../utils/email/sendEmail.js';
+import { default as Email } from '../utils/email/sendEmail.js';
 import BadRequestError from '../utils/errors/BadRequestError.js';
 import InternalServerError from '../utils/errors/InternalServerError.js';
 import UnauthorizedError from '../utils/errors/UnauthorizedError.js';
@@ -49,6 +49,12 @@ export const signup = catchAsync(async (req, res, next) => {
   const { role, photo, ...signupData } = req.body;
 
   const user = await User.create(signupData);
+
+  const url = `${req.protocol}://${req.get('host')}/me`;
+
+  console.log(url);
+
+  await new Email(user, url).sendWelcome();
 
   createAndSendToken(user, status.CREATED, res);
 });
@@ -109,11 +115,11 @@ export const forgotPassword = catchAsync(async (req, res, next) => {
   const message = `Forgot your password? Submit a PATCH request with your new password and passwordConfirm to: ${resetURL}\nIf you didn't forget your password, please ignore this email`;
 
   try {
-    await sendEmail({
-      email,
-      subject: 'Password Reset Token (valid for 10 minutes)',
-      message,
-    });
+    // await sendEmail({
+    //   email,
+    //   subject: 'Password Reset Token (valid for 10 minutes)',
+    //   message,
+    // });
   } catch {
     user.passwordResetToken = undefined;
     user.passwordResetExpires = undefined;

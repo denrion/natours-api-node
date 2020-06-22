@@ -31,7 +31,7 @@ class Email {
     // 1) Render HTML based on pug template
     const html = pug.renderFile(
       `${path.resolve('views', 'emails', `${template}.pug`)}`,
-      { firstName: this.firstName, url: this.ur, subject }
+      { firstName: this.firstName, url: this.url, subject }
     );
 
     // 2) Define the email options
