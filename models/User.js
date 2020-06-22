@@ -31,12 +31,16 @@ const userSchema = new mongoose.Schema(
         /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
         'Please provide a valid email',
       ],
-      validate: {
-        // eslint-disable-next-line no-use-before-define
-        validator: async (val) => !(await User.findByEmail(val)),
-        message:
-          'User with {PATH}: {VALUE} already exists. Please use another value.',
-      },
+      // FIND A WAY TO CHECK ONLY IF EMAIL CHANGED
+      // validate: {
+      //   // eslint-disable-next-line no-use-before-define
+      //   validator: async (val) => {
+      //     console.log(val);
+      //     return !(await User.findByEmail(val));
+      //   },
+      //   message:
+      //     'User with {PATH}: {VALUE} already exists. Please use another value.',
+      // },
     },
     role: {
       type: String,

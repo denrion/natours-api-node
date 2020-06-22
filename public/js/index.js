@@ -2,13 +2,16 @@
 import '@babel/polyfill';
 import { login, logout } from './auth';
 import displayMap from './mapbox';
-import { updateData } from './updateSettings.js';
+import { updateSettings } from './updateSettings.js';
 
 // DOM ELEMENTS
 const mapSection = document.getElementById('map');
 const loginFrom = document.querySelector('.form');
 const logoutBtn = document.querySelector('.nav__el--logout');
 const userDataFormSubmitBtn = document.querySelector('.form-user-data .btn');
+const userPasswordFormSubmitBtn = document.querySelector(
+  '.form-user-password .btn'
+);
 
 // DELEGATION
 if (mapSection) {
@@ -36,6 +39,29 @@ if (userDataFormSubmitBtn) {
     const name = document.getElementById('name').value;
     const email = document.getElementById('email').value;
 
-    updateData(name, email);
+    updateSettings({ name, email }, 'data');
+  });
+}
+
+if (userPasswordFormSubmitBtn) {
+  userPasswordFormSubmitBtn.addEventListener('click', async (e) => {
+    e.preventDefault();
+
+    userPasswordFormSubmitBtn.textContent = 'Updating...';
+
+    const oldPassword = document.getElementById('password-current').value;
+    const newPassword = document.getElementById('password').value;
+    const passwordConfirm = document.getElementById('password-confirm').value;
+
+    await updateSettings(
+      { oldPassword, newPassword, passwordConfirm },
+      'password'
+    );
+
+    userPasswordFormSubmitBtn.textContent = 'Save Password'.toUpperCase();
+
+    document.getElementById('password-current').value = '';
+    document.getElementById('password').value = '';
+    document.getElementById('password-confirm').value = '';
   });
 }
