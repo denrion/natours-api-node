@@ -6,6 +6,7 @@ import {
   login,
   logout,
   resetPassword,
+  resizeUserPhoto,
   singup,
   updateMe,
   updateMyPassword,
@@ -25,7 +26,7 @@ router.patch('/resetPassword/:token', resetPassword);
 router.use(isAuth);
 
 router.get('/me', getMe);
-router.patch('/updateMe', uploadUserPhoto, updateMe);
+router.patch('/updateMe', uploadUserPhoto, resizeUserPhoto, updateMe);
 router.patch('/updateMyPassword', updateMyPassword);
 router.delete('/deleteMe', deleteMe);
 
