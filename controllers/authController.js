@@ -52,8 +52,6 @@ export const signup = catchAsync(async (req, res, next) => {
 
   const url = `${req.protocol}://${req.get('host')}/me`;
 
-  console.log(url);
-
   await new Email(user, url).sendWelcome();
 
   createAndSendToken(user, status.CREATED, res);
@@ -108,18 +106,17 @@ export const forgotPassword = catchAsync(async (req, res, next) => {
   await user.save({ validateBeforeSave: false });
 
   // 3) send it back as an email
-  const resetURL = `${req.protocol}://${req.get(
-    'host'
-  )}/api/v1/auth/resetPassword/${resetToken}`;
-
-  const message = `Forgot your password? Submit a PATCH request with your new password and passwordConfirm to: ${resetURL}\nIf you didn't forget your password, please ignore this email`;
-
   try {
-    // await sendEmail({
-    //   email,
-    //   subject: 'Password Reset Token (valid for 10 minutes)',
-    //   message,
-    // });
+    const resetURL = `${req.protocol}://${req.get(
+      'host'
+    )}/api/v1/auth/resetPassword/${resetToken}`;
+
+    new Email(user, resetURL).sendPasswordReset();
+
+    res.status(status.OK).json({
+      status: ResponseStatus.SUCCESS,
+      message: 'Token sent to email',
+    });
   } catch {
     user.passwordResetToken = undefined;
     user.passwordResetExpires = undefined;
@@ -131,11 +128,6 @@ export const forgotPassword = catchAsync(async (req, res, next) => {
       )
     );
   }
-
-  res.status(status.OK).json({
-    status: ResponseStatus.SUCCESS,
-    message: 'Token sent to email',
-  });
 });
 
 // @desc      Reset Password
@@ -156,6 +148,7 @@ export const resetPassword = catchAsync(async (req, res, next) => {
     return next(new BadRequestError('Token is invalid or has expired'));
 
   const { password, passwordConfirm } = req.body;
+
   user.password = password;
   user.passwordConfirm = passwordConfirm;
   user.passwordResetToken = undefined;
