@@ -9,6 +9,7 @@ import {
   singup,
   updateMe,
   updateMyPassword,
+  uploadUserPhoto,
 } from '../controllers/authController.js';
 import isAuth from '../middleware/isAuth.js';
 
@@ -24,7 +25,7 @@ router.patch('/resetPassword/:token', resetPassword);
 router.use(isAuth);
 
 router.get('/me', getMe);
-router.patch('/updateMe', updateMe);
+router.patch('/updateMe', uploadUserPhoto, updateMe);
 router.patch('/updateMyPassword', updateMyPassword);
 router.delete('/deleteMe', deleteMe);
 

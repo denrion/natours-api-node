@@ -1,5 +1,6 @@
 import crypto from 'crypto';
 import status from 'http-status';
+import multer from 'multer';
 import User from '../models/User.js';
 import catchAsync from '../utils/catchAsync.js';
 import createAndSendToken from '../utils/createAndSendToken.js';
@@ -9,6 +10,28 @@ import InternalServerError from '../utils/errors/InternalServerError.js';
 import UnauthorizedError from '../utils/errors/UnauthorizedError.js';
 import filterReqBody from '../utils/filterReqBody.js';
 import ResponseStatus from '../utils/responseStatus.js';
+
+const multerStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'public/img/users');
+  },
+  filename: (req, file, cb) => {
+    const ext = file.mimetype.split('/')[1];
+    cb(null, `user-${req.user.id}-${Date.now()}.${ext}`);
+  },
+});
+
+const multerFilter = (req, file, cb) => {
+  if (!file.mimetype.startsWith('image')) {
+    cb(new BadRequestError('Not an image! Please upload only images'), false);
+  }
+
+  cb(null, true);
+};
+
+const upload = multer({ storage: multerStorage, fileFilter: multerFilter });
+
+export const uploadUserPhoto = upload.single('photo');
 
 // @desc      Signup user
 // @route     POST /api/v1/auth/signup
@@ -148,6 +171,8 @@ export const getMe = catchAsync(async (req, res, next) => {
 export const updateMe = catchAsync(async (req, res, next) => {
   // Only allow update for specified fields
   const filteredBody = filterReqBody(req.body, 'name', 'email');
+
+  if (req.file) filteredBody.photo = req.file.filename;
 
   const updatedUser = await User.findByIdAndUpdate(req.user.id, filteredBody, {
     new: true,

@@ -48,7 +48,10 @@ const userSchema = new mongoose.Schema(
       default: Role.USER,
       required: true,
     },
-    photo: String,
+    photo: {
+      type: String,
+      default: 'default.jpg',
+    },
     password: {
       type: String,
       required: [true, 'Please provide a password'],
