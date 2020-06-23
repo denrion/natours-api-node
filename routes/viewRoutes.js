@@ -1,4 +1,5 @@
 import express from 'express';
+import { createBookingCheckout } from '../controllers/bookingController.js';
 import {
   getAccount,
   getLoginForm,
@@ -9,7 +10,7 @@ import isAuth, { isLoggedIn } from '../middleware/isAuth.js';
 
 const router = express.Router();
 
-router.get('/', isLoggedIn, getOverview);
+router.get('/', createBookingCheckout, isLoggedIn, getOverview);
 router.get('/tour/:slug', isLoggedIn, getTour);
 router.get('/login', isLoggedIn, getLoginForm);
 router.get('/me', isAuth, getAccount);
