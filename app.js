@@ -11,6 +11,7 @@ import path from 'path';
 import xss from 'xss-clean';
 import globalErrorHandler from './controllers/errorController.js';
 import { authRouter } from './routes/authRoutes.js';
+import { bookingRouter } from './routes/bookingRoutes.js';
 import { reviewRouter } from './routes/reviewRoutes.js';
 import { tourRouter } from './routes/tourRoutes.js';
 import { userRouter } from './routes/userRoutes.js';
@@ -80,6 +81,7 @@ app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/reviews', reviewRouter);
+app.use('/api/v1/bookings', bookingRouter);
 
 // Serve static assets in produciton
 // if (process.env.NODE_ENV === 'production') {

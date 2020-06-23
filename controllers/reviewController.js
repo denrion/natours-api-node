@@ -10,25 +10,25 @@ import {
 
 // @desc      Get All Reviews
 // @route     GET /api/v1/reviews
-// @access    Public
+// @access    Private
 export const getAllReviews = getAll(Review);
 
 // @desc      Get Review By Id
 // @route     GET /api/v1/reviews/:reviewId
-// @access    Public
+// @access    Private
 export const getReview = getOne(Review);
 
 // @desc      Create New Rview
 // @route     POST /api/v1/reviews
-// @access    Public
+// @access    Private
 export const createReview = createOne(Review);
 
 // @desc      Update review
 // @route     PATHS /api/v1/reviews/:reviewId
-// @access    Public
+// @access    Private
 export const updateReview = updateOne(Review);
 
 // @desc      Delete review
 // @route     DELETE /api/v1/reviews/:reviewId
-// @access    Public
+// @access    Private
 export const deleteReview = deleteOne(Review);
