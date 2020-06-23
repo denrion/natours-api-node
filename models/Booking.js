@@ -13,6 +13,14 @@ const bookingSchema = new mongoose.Schema(
       ref: 'User',
       required: [true, 'A booking must belong to a user'],
     },
+    price: {
+      type: Number,
+      required: [true, 'A booking must have a price'],
+    },
+    paid: {
+      type: Boolean,
+      default: true,
+    },
   },
   {
     timestamps: true,
@@ -25,6 +33,10 @@ const bookingSchema = new mongoose.Schema(
 // ******************* DOCUMENT MIDDLEWARE ****************** //
 
 // ******************** QUERY MIDDLEWARE ******************* //
+bookingSchema.pre(/^find/, function (next) {
+  this.populate('user').populate({ path: 'tour', select: 'name' });
+  next();
+});
 
 // **************** AGGREGATION MIDDLEWARE **************** //
 
