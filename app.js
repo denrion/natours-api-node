@@ -23,6 +23,9 @@ dotenv.config();
 
 const app = express();
 
+// Enable proxies to allow HTTPS over HEROKu
+app.enable('trust proxy');
+
 app.set('view engine', 'pug');
 app.set('views', path.resolve('views'));
 

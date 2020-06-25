@@ -54,7 +54,7 @@ export const signup = catchAsync(async (req, res, next) => {
 
   await new Email(user, url).sendWelcome();
 
-  createAndSendToken(user, status.CREATED, res);
+  createAndSendToken(user, status.CREATED, req, res);
 });
 
 // @desc      Login user
@@ -71,7 +71,7 @@ export const login = catchAsync(async (req, res, next) => {
   if (!user || !(await user.isCorrectPassword(password, user.password)))
     return next(new UnauthorizedError('Invalid credentials'));
 
-  createAndSendToken(user, status.OK, res);
+  createAndSendToken(user, status.OK, req, res);
 });
 
 // @desc      Logout user
@@ -156,7 +156,7 @@ export const resetPassword = catchAsync(async (req, res, next) => {
   await user.save();
 
   // 3) Log the user in, send JWT to client
-  createAndSendToken(user, status.OK, res);
+  createAndSendToken(user, status.OK, req, res);
 });
 
 // @desc      Get Current Logged In user
@@ -216,7 +216,7 @@ export const updateMyPassword = catchAsync(async (req, res, next) => {
   await user.save();
 
   // 4) Log user in, send JWT
-  createAndSendToken(user, status.OK, res);
+  createAndSendToken(user, status.OK, req, res);
 });
 
 // @desc      "Delete" currently logged in user
