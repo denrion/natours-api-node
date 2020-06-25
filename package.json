@@ -63,6 +63,6 @@
     "url": "git+https://github.com/denrion/natours-api-node.git"
   },
   "engines": {
-    "node": ">= 14.4.0"
+    "node": "^14.4.0"
   }
 }

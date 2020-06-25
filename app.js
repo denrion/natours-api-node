@@ -70,8 +70,15 @@ app.use(
   })
 );
 
-// CORS
-app.use(cors({ credentials: true }));
+// Implement CORS
+app.use(
+  cors({
+    // origin: 'https://pure-plains-62597.herokuapp.com/',
+    credentials: true,
+  })
+);
+
+app.options('*', cors({ credentials: true }));
 
 // Compress sent JSON data
 app.use(compression());
@@ -89,15 +96,6 @@ app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/reviews', reviewRouter);
 app.use('/api/v1/bookings', bookingRouter);
-
-// Serve static assets in produciton
-// if (process.env.NODE_ENV === 'production') {
-//   app.use(express.static(path.resolve('public')));
-
-//   app.get('*', (req, res, next) => {
-//     res.sendFile(path.resolve('public', 'overview.html'));
-//   });
-// }
 
 app.all('*', (req, res, next) => {
   next(
