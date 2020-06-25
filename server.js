@@ -21,3 +21,12 @@ process.on('unhandledRejection', (err) => {
   // Close server & exit process
   server.close(() => process.exit(1));
 });
+
+// Gracefull shutdown app when HEROKU sends SIGTERM signal
+process.on('SIGTERM', () => {
+  console.error(colors.yellow('👋 SIGTERM RECEIVED. Shutting down gracefully'));
+  // Close server & exit process
+  server.close(() => {
+    console.log(colors.yellow('💥 Process terminated'));
+  });
+});
