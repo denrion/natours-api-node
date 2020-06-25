@@ -1,7 +1,9 @@
 import axios from 'axios';
 
-const API = axios.create({
-  baseURL: 'http://localhost:4000',
-});
+let baseURL = 'http://localhost:4000';
+
+if (process.env.NODE_ENV === 'production') baseURL = '/';
+
+const API = axios.create({ baseURL });
 
 export default API;
