@@ -14,7 +14,7 @@
     "seed": "node ./config/seeder.js --import",
     "reset": "node ./config/seeder.js --delete",
     "watch:js": "parcel watch ./public/js/index.js --out-dir ./public/js --out-file bundle.js",
-    "build:js": "parcel ./public/js/index.js --out-dir ./public/js --out-file bundle.js"
+    "build:js": "parcel build ./public/js/index.js --out-dir ./public/js --out-file bundle.js"
   },
   "dependencies": {
     "axios": "^0.19.2",
