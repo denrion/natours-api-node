@@ -1,3 +1,4 @@
+import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import dotenv from 'dotenv';
@@ -68,6 +69,9 @@ app.use(
 
 // CORS
 app.use(cors({ credentials: true }));
+
+// Compress sent JSON data
+app.use(compression());
 
 // Development logging
 if (process.env.NODE_ENV === 'development') {
